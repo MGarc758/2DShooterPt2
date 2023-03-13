@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 public class EnemyManager : MonoBehaviour
@@ -15,6 +16,7 @@ public class EnemyManager : MonoBehaviour
     public int rowCount;
     
     public Transform environmentRoot;
+    private int enemiesAlive;
 
     //for Spawning Enemies
     private GameObject[] enemyPrefabs;
@@ -34,6 +36,7 @@ public class EnemyManager : MonoBehaviour
     void Start()
     {
         Enemy.OnBulletSpawn += EnemyOnBulletSpawn;
+        Enemy.OnEnemyAboutToBeDestroyed += EnemyOnEnemyAboutToBeDestroyed;
         Enemy.OnEnemySpeedUp += EnemySpeedUp;
         enemyPrefabs = new[] { enemy1Prefab, enemy2Prefab, enemy3Prefab, enemy4Prefab};
 
@@ -54,6 +57,7 @@ public class EnemyManager : MonoBehaviour
                     newEnemy.transform.SetParent(environmentRoot);
 
                     position.x += spacingX;
+                    enemiesAlive++;
                 }
             }
 
@@ -97,9 +101,14 @@ public class EnemyManager : MonoBehaviour
 
             }
         }
+
+        if (enemiesAlive <= 0)
+        {
+            SceneManager.LoadScene("CreditScene", LoadSceneMode.Single);
+        }
     }
 
-    private void EnemyOnBulletSpawn(GameObject enemyBullet)
+    private void EnemyOnBulletSpawn(GameObject enemyBullet, AudioSource shootSound)
     {
         int random = Random.Range(0, 4);
         if (random == 1)
@@ -108,6 +117,7 @@ public class EnemyManager : MonoBehaviour
             bulletSpawn.y = environmentRoot.position.y;
             bulletSpawn.z = 0f;
             GameObject shot = Instantiate(enemyBullet, bulletSpawn, Quaternion.identity);
+            shootSound.Play();
             
             Debug.Log("Bang!");
         }
@@ -116,5 +126,11 @@ public class EnemyManager : MonoBehaviour
     private void EnemySpeedUp(float speedValue)
     {
         speed += speedValue;
+    }
+
+    private void EnemyOnEnemyAboutToBeDestroyed(int pointValue)
+    {
+        enemiesAlive--;
+        Debug.Log($"Enemies Alive: {enemiesAlive}");
     }
 }

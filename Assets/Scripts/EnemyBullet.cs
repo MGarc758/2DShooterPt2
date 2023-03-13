@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EnemyBullet : MonoBehaviour
 {
@@ -20,15 +21,5 @@ public class EnemyBullet : MonoBehaviour
     {
         myRigidbody2D.velocity = Vector2.down * speed; 
         Debug.Log("Enemy Shoot!");
-    }
-
-    private void OnCollisionEnter2D(Collision2D col)
-    {
-        if (col.gameObject.name is "Player")
-        {
-            Debug.Log("Player Died! Restart Game to try again.");
-            Destroy(col.gameObject);
-            Destroy(this.gameObject);
-        }
     }
 }
